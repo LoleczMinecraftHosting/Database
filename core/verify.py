@@ -2,6 +2,7 @@ import hashlib
 import time
 import uuid
 from typing import Dict
+from logs import log, DEBUG
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
@@ -37,12 +38,15 @@ def verify_signature(public_key: Ed25519PublicKey, method: str, path: str, body_
 
     now = int(time.time())
     if now - MAX_SKEW_SECONDS > timestamp:
+        log(DEBUG, "fail auth Late timestamp")
         return False
     if timestamp > now + 5:
+        log(DEBUG, "fail auth too future timestamp")
         return False
 
     nonce_key = f"{timestamp}:{nonce}"
     if nonce_key in seen_nonce:
+        log(DEBUG, "fail auth already seen nonce")
         return False
 
     body_hash = hashlib.sha256(body_bytes).hexdigest()
@@ -51,6 +55,7 @@ def verify_signature(public_key: Ed25519PublicKey, method: str, path: str, body_
     try:
         public_key.verify(signature, challenge)
     except InvalidSignature:
+        log(DEBUG, "fail auth invalid signature")
         return False
 
     seen_nonce[nonce_key] = now
