@@ -80,3 +80,223 @@ def add_server_config(
         raise
     finally:
         conn.close()
+
+
+
+def edit_server_display_name(name, display_name):
+    name = make_str(name)
+    display_name = make_str(display_name)
+    if not name or not display_name:
+        return DBReturn(Status.INVALID_INPUT)
+
+    conn = get_database()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE servers
+            SET display_name = ?
+            WHERE name = ?
+            """,
+            (display_name, name)
+        )
+
+        if cursor.rowcount == 0:
+            return DBReturn(Status.NOT_FOUND)
+        conn.commit()
+        return DBReturn(Status.OK)
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def edit_server_node(name, node_id):
+    name = make_str(name)
+    node_id = make_str(node_id)
+    if not name or not node_id:
+        return DBReturn(Status.INVALID_INPUT)
+
+    conn = get_database()
+    cursor = conn.cursor()
+
+    try:
+        if not node_exists(node_id, cursor):
+            return DBReturn(Status.NOT_FOUND)
+
+        cursor.execute(
+            """
+            UPDATE servers
+            SET node_id = ?
+            WHERE name = ?
+            """,
+            (node_id, name)
+        )
+
+        if cursor.rowcount == 0:
+            return DBReturn(Status.NOT_FOUND)
+        conn.commit()
+        return DBReturn(Status.OK)
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def edit_server_host(name, host, port):
+    name = make_str(name)
+    host = make_str(host)
+    port = make_int(port)
+    if not name:
+        return DBReturn(Status.INVALID_INPUT)
+
+    conn = get_database()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE servers
+            SET host = ?,
+                port = ?
+            WHERE name = ?
+            """,
+            (host, port, name)
+        )
+
+        if cursor.rowcount == 0:
+            return DBReturn(Status.NOT_FOUND)
+        conn.commit()
+        return DBReturn(Status.OK)
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def edit_server_ram(name, ram_min_mb, ram_max_mb):
+    name = make_str(name)
+    ram_min_mb = make_int(ram_min_mb)
+    ram_max_mb = make_int(ram_max_mb)
+    if not name or ram_min_mb is None or ram_max_mb is None:
+        return DBReturn(Status.INVALID_INPUT)
+    if ram_min_mb < 0 or ram_max_mb < ram_min_mb:
+        return DBReturn(Status.INVALID_INPUT)
+
+    conn = get_database()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE servers
+            SET ram_min_mb = ?,
+                ram_max_mb = ?
+            WHERE name = ?
+            """,
+            (ram_min_mb, ram_max_mb, name)
+        )
+
+        if cursor.rowcount == 0:
+            return DBReturn(Status.NOT_FOUND)
+        conn.commit()
+        return DBReturn(Status.OK)
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def edit_server_start_command(name, start_command):
+    name = make_str(name)
+    start_command = make_str(start_command)
+    if not name:
+        return DBReturn(Status.INVALID_INPUT)
+
+    conn = get_database()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE servers
+            SET start_command = ?
+            WHERE name = ?
+            """,
+            (start_command, name)
+        )
+
+        if cursor.rowcount == 0:
+            return DBReturn(Status.NOT_FOUND)
+        conn.commit()
+        return DBReturn(Status.OK)
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def edit_server_stop_command(name, stop_command):
+    name = make_str(name)
+    stop_command = make_str(stop_command)
+    if not name:
+        return DBReturn(Status.INVALID_INPUT)
+
+    conn = get_database()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE servers
+            SET stop_command = ?
+            WHERE name = ?
+            """,
+            (stop_command, name)
+        )
+
+        if cursor.rowcount == 0:
+            return DBReturn(Status.NOT_FOUND)
+        conn.commit()
+        return DBReturn(Status.OK)
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def edit_server_working_directory(name, working_directory):
+    name = make_str(name)
+    working_directory = make_str(working_directory)
+    if not name:
+        return DBReturn(Status.INVALID_INPUT)
+
+    conn = get_database()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE servers
+            SET working_directory = ?
+            WHERE name = ?
+            """,
+            (working_directory, name)
+        )
+
+        if cursor.rowcount == 0:
+            return DBReturn(Status.NOT_FOUND)
+        conn.commit()
+        return DBReturn(Status.OK)
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()

@@ -16,7 +16,7 @@ class APIFunc:
     autoauth: bool | set
 
 
-def api_get_json(headers: dict, body: bytes) -> dict | None:
+def api_get_json(headers: dict, body: bytes) -> dict | str | int | bool | None:
     ctype = headers.get("Content-Type", "")
     if ctype != "application/json":
         return None

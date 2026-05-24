@@ -3,7 +3,13 @@ from .utils import get_database_version, DBReturn
 from .utils import Status as DBStatus
 from .permissions import get_perms
 from .nodes import add_node
-from .servers import add_server_config
+from .servers import (
+    add_server_config,
+    edit_server_display_name, edit_server_host,
+    edit_server_node, edit_server_ram,
+    edit_server_start_command, edit_server_stop_command,
+    edit_server_working_directory
+)
 
 
 __all__ = [
@@ -14,4 +20,8 @@ __all__ = [
     "get_perms",
     "add_node",
     "add_server_config",
+    "edit_server_display_name", "edit_server_host",
+    "edit_server_node", "edit_server_ram",
+    "edit_server_start_command", "edit_server_stop_command",
+    "edit_server_working_directory",
 ]
