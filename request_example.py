@@ -101,6 +101,7 @@ except HTTPError as error:
     print(error.headers)
     print("Body:")
     print(response_body.decode("utf-8", errors="replace"))
+    print("Verified:", verify_response_signature(auth_map["database"], error.status, response_body, error.headers, nonce))
     sys.exit(1)
 
 except URLError as error:
