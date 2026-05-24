@@ -5,6 +5,157 @@ from .utils import DBReturn, Status, get_database
 from .check_utils import server_exists, node_exists
 
 
+def get_servers():
+    conn = get_database()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            SELECT
+                name,
+                display_name,
+                node_id,
+                status,
+                status_updated_at,
+                host,
+                port,
+                ram_min_mb,
+                ram_max_mb,
+                start_command,
+                stop_command,
+                working_directory
+            FROM servers
+            ORDER BY name
+            """
+        )
+
+        rows = cursor.fetchall()
+        data = {}
+        for row in rows:
+            data[row["name"]] = {
+                "display_name": row["display_name"],
+                "node_id": row["node_id"],
+                "status": row["status"],
+                "status_updated_at": row["status_updated_at"],
+                "host": row["host"],
+                "port": row["port"],
+                "ram_min_mb": row["ram_min_mb"],
+                "ram_max_mb": row["ram_max_mb"],
+                "start_command": row["start_command"],
+                "stop_command": row["stop_command"],
+                "working_directory": row["working_directory"],
+            }
+        return DBReturn(Status.OK, data=data)
+    finally:
+        conn.close()
+
+
+def get_server_config(name):
+    name = make_str(name)
+    if not name:
+        return DBReturn(Status.INVALID_INPUT)
+
+    conn = get_database()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            SELECT
+                name,
+                display_name,
+                node_id,
+                status,
+                status_updated_at,
+                host,
+                port,
+                ram_min_mb,
+                ram_max_mb,
+                start_command,
+                stop_command,
+                working_directory
+            FROM servers
+            WHERE name = ?
+            """,
+            (name,)
+        )
+        row = cursor.fetchone()
+        if row is None:
+            return DBReturn(Status.NOT_FOUND)
+        return DBReturn(
+            Status.OK,
+            data={
+                "name": row["name"],
+                "display_name": row["display_name"],
+                "node_id": row["node_id"],
+                "status": row["status"],
+                "status_updated_at": row["status_updated_at"],
+                "host": row["host"],
+                "port": row["port"],
+                "ram_min_mb": row["ram_min_mb"],
+                "ram_max_mb": row["ram_max_mb"],
+                "start_command": row["start_command"],
+                "stop_command": row["stop_command"],
+                "working_directory": row["working_directory"],
+            },
+        )
+    finally:
+        conn.close()
+
+def get_node_servers(node_id):
+    node_id = make_str(node_id)
+    if not node_id:
+        return DBReturn(Status.INVALID_INPUT)
+
+    conn = get_database()
+    cursor = conn.cursor()
+
+    try:
+        if not node_exists(node_id, cursor):
+            return DBReturn(Status.NOT_FOUND)
+        cursor.execute(
+            """
+            SELECT
+                name,
+                display_name,
+                node_id,
+                status,
+                status_updated_at,
+                host,
+                port,
+                ram_min_mb,
+                ram_max_mb,
+                start_command,
+                stop_command,
+                working_directory
+            FROM servers
+            WHERE node_id = ?
+            ORDER BY name
+            """,
+            (node_id,)
+        )
+        rows = cursor.fetchall()
+        data = {}
+        for row in rows:
+            data[row["name"]] = {
+                "display_name": row["display_name"],
+                "node_id": row["node_id"],
+                "status": row["status"],
+                "status_updated_at": row["status_updated_at"],
+                "host": row["host"],
+                "port": row["port"],
+                "ram_min_mb": row["ram_min_mb"],
+                "ram_max_mb": row["ram_max_mb"],
+                "start_command": row["start_command"],
+                "stop_command": row["stop_command"],
+                "working_directory": row["working_directory"],
+            }
+        return DBReturn(Status.OK, data=data)
+    finally:
+        conn.close()
+
+
 def add_server_config(
     name, display_name,
     node_id,
