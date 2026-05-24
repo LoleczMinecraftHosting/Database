@@ -8,7 +8,8 @@ from .servers import (
     edit_server_display_name, edit_server_host,
     edit_server_node, edit_server_ram,
     edit_server_start_command, edit_server_stop_command,
-    edit_server_working_directory
+    edit_server_working_directory,
+    update_server_status,
 )
 
 
@@ -24,4 +25,5 @@ __all__ = [
     "edit_server_node", "edit_server_ram",
     "edit_server_start_command", "edit_server_stop_command",
     "edit_server_working_directory",
+    "update_server_status",
 ]

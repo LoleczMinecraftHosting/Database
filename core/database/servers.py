@@ -300,3 +300,35 @@ def edit_server_working_directory(name, working_directory):
         raise
     finally:
         conn.close()
+
+
+def update_server_status(name, status):
+    name = make_str(name)
+    status = make_str(status)
+    if not name or not status:
+        return DBReturn(Status.INVALID_INPUT)
+
+    conn = get_database()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE servers
+            SET
+                status = ?,
+                status_updated_at = ?
+            WHERE name = ?
+            """,
+            (status, int(time.time()), name)
+        )
+
+        if cursor.rowcount == 0:
+            return DBReturn(Status.NOT_FOUND)
+        conn.commit()
+        return DBReturn(Status.OK)
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
