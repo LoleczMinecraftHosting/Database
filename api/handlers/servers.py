@@ -1,5 +1,6 @@
 from core.database import (
     DBStatus,
+    get_servers, get_server_config,
     add_server_config,
     edit_server_display_name, edit_server_host,
     edit_server_node, edit_server_ram, edit_server_start_command, edit_server_stop_command,
@@ -8,6 +9,20 @@ from core.database import (
 )
 from api.api_core import APIHandler
 from api.utils import APIReturn, read_dict, api_get_json
+
+
+@APIHandler.get("/servers")
+def get_all_servers(headers, query):
+    return APIReturn(get_servers().data)
+
+@APIHandler.get("/server/{server_name}")
+def get_server(headers, query, server_name):
+    result = get_server_config(server_name)
+    if result.status == DBStatus.INVALID_INPUT:
+        return APIReturn({"error": "invalid input"}, code=400)
+    if result.status == DBStatus.NOT_FOUND:
+        return APIReturn({"error": "server does not exist"}, code=404)
+    return APIReturn(result.data)
 
 
 @APIHandler.post("/server/{server_name}", autoauth={"admin"})
