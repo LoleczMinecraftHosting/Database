@@ -11,14 +11,16 @@ def create_database(db_path, version):
     file = FULL_SCHEMAS[version]
     path = Path(db_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    run_sql_file(db_path, file)
+    try:
+        run_sql_file(db_path, file)
+    except Exception as err:
+        log(ERROR, f"Error while creating database;\n{err}")
     if get_database_version(db_path) != version:
         log(ERROR, f"creating database with version <{version}> failed")
         if path.is_file():
             log(INFO, "removing broken database file")
             path.unlink()
-        raise RuntimeError(
-            f"creating database with version <{version}> failed")
+        raise RuntimeError(f"creating database with version <{version}> failed")
     log(SUCCESS, f"database created at {db_path}")
 
 
@@ -34,9 +36,11 @@ def migrate_database(path, current, target):
     for i in range(current, target):
         sql_path = MIGRATIONS[i]
         log(INFO, f"migrating database from version <{i}> to <{i+1}>")
-        run_sql_file(path, sql_path)
+        try:
+            run_sql_file(path, sql_path)
+        except Exception as err:
+            log(ERROR, f"Error while creating migrating database;\n{err}")
         if get_database_version(path) != i + 1:
             log(ERROR, f"migration from version <{i}> to <{i+1}> failed")
-            raise RuntimeError(
-                f"migration from version <{i}> to <{i+1}> failed")
+            raise RuntimeError(f"migration from version <{i}> to <{i+1}> failed")
     log(SUCCESS, f"database succesfully migrated to {target}")
