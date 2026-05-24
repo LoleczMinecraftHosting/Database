@@ -30,6 +30,8 @@ def get_path_from_url(url):
     if parsed.query:
         path = f"{path}?{parsed.query}"
 
+    if path.startswith("/database"):
+        return path[len("/database"):]
     return path
 
 
