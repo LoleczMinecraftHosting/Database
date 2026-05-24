@@ -7,4 +7,11 @@ Most of this database was copied from my [LoleczDustry Database](https://github.
 | GET /health  | 200 | `{"status": "ok"}` |
 | GET /get_perms | 200 | `{"guilds":{"ID":{"server":PERMS}},`<br>`"users":{"ID":{"server":PERMS}},`<br>`"global":{"server":PERMS},`<br>`"roles":{"ID":{"server":PERMS}}}` |
 | POST /server/{server_name} | toolazy | Include `display_name, node_id, host, port, min_ram_mb, max_ram_mb, start_command, stop_command, directory` |
+| POST `/server/{server_name}/display_name` | 200/400/404 | Raw JSON value: `"New Display Name"` |
+| POST `/server/{server_name}/node` | 200/400/404 | Raw JSON value: `"node_id"` |
+| POST `/server/{server_name}/start_command` | 200/400/404 | Raw JSON value: `"java -Xms{min_ram_mb}M -Xmx{max_ram_mb}M -jar server.jar nogui"` |
+| POST `/server/{server_name}/stop_command` | 200/400/404 | Raw JSON value: `"stop"` |
+| POST `/server/{server_name}/working_directory` | 200/400/404 | Raw JSON value: `"/home/user/server"` |
+| POST `/server/{server_name}/host` | 200/400/404 | Include `host, port` |
+| POST `/server/{server_name}/ram` | 200/400/404 | Include `min_ram_mb, max_ram_mb` |
 | POST /add_node | toolazy | Include `node_id, name, address` |
