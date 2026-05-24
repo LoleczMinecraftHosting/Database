@@ -3,7 +3,7 @@ from pathlib import Path
 HOME = Path.home()
 DIR = Path(__file__).parent
 
-IN_PROD = False
+IN_PROD = True
 DATABASE_SUPPORTED_VERSION = 2
 
 DATABASE_DEFINITIONS_DIR = DIR / "database_schemas"
