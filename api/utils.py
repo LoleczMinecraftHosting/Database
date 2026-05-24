@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, Dict
+from typing import Callable, Dict, Literal
 import json
 import time
 
@@ -13,7 +13,7 @@ class APIReturn:
 @dataclass
 class APIFunc:
     func: Callable[[object], APIReturn]
-    autoauth: bool
+    autoauth: bool | set
 
 
 def api_get_json(headers: dict, body: bytes) -> dict | None:
@@ -30,11 +30,15 @@ def api_get_json(headers: dict, body: bytes) -> dict | None:
         return None
 
 
-def read_dict(read: dict, read_elements: list) -> tuple[APIReturn | bool, ...]:
+MISSING = object()
+
+def read_dict(read: dict, read_elements: list) -> tuple[APIReturn | Literal[True], ...]:
     values = [None] * len(read_elements)
+    if not isinstance(read, dict):
+        return (APIReturn({"error": "body_not_json"}, 400), *values)
     for i, element in enumerate(read_elements):
-        readed = read.get(element, None)
-        if readed is None:
+        readed = read.get(element, MISSING)
+        if readed is MISSING:
             return (APIReturn(
                 {"error": {"missing value": element}}, 400),
                 *values)
@@ -43,7 +47,6 @@ def read_dict(read: dict, read_elements: list) -> tuple[APIReturn | bool, ...]:
 
 
 NONCE_TTL = 300
-
 
 def cleanup_seen_nonces(seen_nonce: Dict[object, int]):
     now = time.time()

@@ -5,5 +5,6 @@ FULL_SCHEMAS = {
 }
 
 MIGRATIONS = {
+    0: DATABASE_SCHEMA_FULL_DIR / "v1.sql",
     1: DATABASE_SCHEMA_MIGRATIONS_DIR / "1_to_2.sql",
 }

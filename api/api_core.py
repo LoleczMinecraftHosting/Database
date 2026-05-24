@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
-from typing import Callable, List, Tuple, Pattern
+from typing import Callable, List, Tuple, Pattern, Literal
 import json
 import re
 
@@ -42,12 +42,16 @@ class APIHandler(BaseHTTPRequestHandler):
             length = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(length)
 
-        verified = self._authenticate(body)
-        if not verified and handler.autoauth:
-            log(WARNING, f"API UNAUTH {self.command} 401 "
-                         f"<{client_ip}> {self.path}")
-            self.reply(APIReturn({"error": "unauthorized"}, 401))
-            return
+        if  handler.autoauth:
+            if handler.autoauth is True:
+                verified = self._authenticate(body)
+            else:
+                verified = self._authenticate(body, allow_services=handler.autoauth)
+            if not verified:
+                log(WARNING, f"API UNAUTH {self.command} 401 "
+                            f"<{client_ip}> {self.path}")
+                self.reply(APIReturn({"error": "unauthorized"}, 401))
+                return
 
         try:
             if read_body:
@@ -120,11 +124,13 @@ class APIHandler(BaseHTTPRequestHandler):
         return decorator
 
 
-    def _authenticate(self, body):
+    def _authenticate(self, body, allow_services: set | Literal[True]=True):
         service = self.headers.get("X-Service", "")
+        if allow_services is not True and service not in allow_services:
+            return False
         public_key = self.server.auth_map.get(service.lower(), False)
         if not public_key:
-            return
+            return False
         result = verify_signature(public_key, self.command, self.path, body, self.headers, self.server.seen_nonce)
         cleanup_seen_nonces(self.server.seen_nonce)
         return result

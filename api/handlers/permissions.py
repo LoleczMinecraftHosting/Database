@@ -5,4 +5,4 @@ from api.utils import APIReturn
 
 @APIHandler.get("/get_perms")
 def get_permissions(headers, query):
-    return APIReturn(get_perms())
+    return APIReturn(get_perms().data)
