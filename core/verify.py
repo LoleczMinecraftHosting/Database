@@ -2,12 +2,12 @@ import hashlib
 import time
 import uuid
 from typing import Dict
-from logs import log, DEBUG
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 from cryptography.hazmat.primitives import serialization
 
+from .logs import log, DEBUG
 
 MAX_SKEW_SECONDS = 60
 
