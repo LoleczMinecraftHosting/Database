@@ -8,8 +8,6 @@ from core.utils import user_bool_input
 from core.logs import log, INFO, DEBUG, CRITICAL
 from core.verify import load_auth_map, load_private_key
 from core.database import get_database_version, migrate_database, create_database
-from core.database.database import Database
-from globals import Globals
 from config import DATABASE_DIR, AUTH_MAP_LINK, API_PORT, DATABASE_SUPPORTED_VERSION, PRIV_KEY
 
 log(INFO, "---  PROGRAM START ---")
@@ -67,7 +65,6 @@ if db_version != DATABASE_SUPPORTED_VERSION:
             shutdown()
     else:
         shutdown()
-Globals.database = Database(DATABASE_DIR)
 
 
 log(INFO, "- STARTING API HANDLER -")

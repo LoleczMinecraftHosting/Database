@@ -13,7 +13,7 @@ AUTH_MAP_LINK = "https://minecraft.loleczkowo.com/auth_map.json"
 PRIV_KEY = DIR / "priv_key.pem"
 
 if IN_PROD:
-    DATABASE_DIR = HOME/"database.db"
+    DATABASE_DIR = DIR/"database.db"
     API_PORT = 35000
 else:
     DATABASE_DIR = DIR/"debug.db"

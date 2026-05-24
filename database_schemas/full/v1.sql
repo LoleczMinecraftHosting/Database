@@ -4,7 +4,7 @@ PRAGMA foreign_keys = ON;
 
 
 
-CREATE TABLE IF NOT EXISTS permissions (
+CREATE TABLE permissions (
     subject_type TEXT NOT NULL,
     subject_id TEXT NOT NULL,
     server_name TEXT NOT NULL,
@@ -19,6 +19,35 @@ CREATE TABLE IF NOT EXISTS permissions (
     )
 );
 
+
+CREATE TABLE nodes (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    address TEXT NOT NULL
+);
+
+
+CREATE TABLE servers (
+    name TEXT PRIMARY KEY,
+
+    display_name TEXT NOT NULL,
+    node_id TEXT,
+
+    status TEXT NOT NULL DEFAULT 'unknown',
+    status_updated_at INTEGER,
+
+    host TEXT,
+    port INTEGER,
+
+    ram_min_mb INTEGER NOT NULL DEFAULT 2048,
+    ram_max_mb INTEGER NOT NULL DEFAULT 4096,
+
+    start_command TEXT,
+    stop_command TEXT,
+    working_directory TEXT,
+
+    FOREIGN KEY(node_id) REFERENCES nodes(id)
+);
 
 
 PRAGMA user_version = 1;

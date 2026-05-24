@@ -1,2 +1,4 @@
 *.pem
 *.db
+*.db-wal
+*.db-shm

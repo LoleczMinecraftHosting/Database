@@ -1,18 +1,17 @@
 import sqlite3
-from config import DATABASE_DIR
 import enum
 from dataclasses import dataclass
 from typing import Any
+from config import DATABASE_DIR
 
 
-def get_conn() -> sqlite3.Connection:
-    conn = sqlite3.connect(DATABASE_DIR)
-    conn.execute("PRAGMA foreign_keys = ON")
-    return conn
-
-
-def init_cursor(conn: sqlite3.Connection) -> sqlite3.Cursor:
-    return conn.cursor()
+def get_database():
+    connection = sqlite3.connect(DATABASE_DIR)
+    connection.row_factory = sqlite3.Row
+    connection.execute("PRAGMA journal_mode = WAL")
+    connection.execute("PRAGMA busy_timeout = 5000")
+    connection.execute("PRAGMA foreign_keys = ON")
+    return connection
 
 
 def run_sql_file(run_path, sql_file_path):
