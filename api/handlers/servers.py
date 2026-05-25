@@ -2,6 +2,7 @@ from core.database import (
     DBStatus,
     get_servers, get_server_config,
     add_server_config,
+    edit_server_close_time,
     edit_server_display_name, edit_server_host,
     edit_server_node, edit_server_ram, edit_server_start_command, edit_server_stop_command,
     edit_server_working_directory,
@@ -27,12 +28,12 @@ def get_server(headers, query, server_name):
 
 @APIHandler.post("/server/{server_name}", autoauth={"admin"})
 def post_add_server(headers, query, data, server_name):
-    success, display_name, node_id, host, port, min_ram_mb, max_ram_mb, start_command, stop_command, directory = read_dict(api_get_json(headers, data), ["display_name", "node_id", "host", "port", "min_ram_mb", "max_ram_mb", "start_command", "stop_command", "directory"])
+    success, display_name, node_id, close_time, host, port, min_ram_mb, max_ram_mb, start_command, stop_command, directory = read_dict(api_get_json(headers, data), ["display_name", "node_id", "close_time", "host", "port", "min_ram_mb", "max_ram_mb", "start_command", "stop_command", "directory"])
     if success is not True:
         return success
     result = add_server_config(
         name=server_name, display_name=display_name,
-        node_id=node_id, host=host, port=port,
+        node_id=node_id, close_time=close_time, host=host, port=port,
         ram_min_mb=min_ram_mb, ram_max_mb=max_ram_mb,
         start_command=start_command, stop_command=stop_command,
         working_directory=directory
@@ -45,6 +46,16 @@ def post_add_server(headers, query, data, server_name):
         return APIReturn({"error": "node does not exist"}, code=404)
     return APIReturn({"status": "ok"})
 
+
+@APIHandler.post("/server/{server_name}/close_time", autoauth={"admin"})
+def post_edit_server_close_time(headers, query, data, server_name):
+    new_value = api_get_json(headers, data)
+    result = edit_server_close_time(name=server_name, close_time=new_value)
+    if result.status == DBStatus.INVALID_INPUT:
+        return APIReturn({"error": "invalid input"}, code=400)
+    if result.status == DBStatus.NOT_FOUND:
+        return APIReturn({"error": "server does not exist"}, code=404)
+    return APIReturn({"status": "ok"})
 
 @APIHandler.post("/server/{server_name}/display_name", autoauth={"admin"})
 def post_edit_server_display_name(headers, query, data, server_name):

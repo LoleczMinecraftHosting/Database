@@ -1,0 +1,8 @@
+BEGIN;
+
+ALTER TABLE servers
+ADD COLUMN close_time INTEGER NOT NULL DEFAULT 1800;
+
+PRAGMA user_version = 3;
+
+COMMIT;
