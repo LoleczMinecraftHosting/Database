@@ -18,6 +18,7 @@ def get_servers():
                 node_id,
                 status,
                 status_updated_at,
+                close_time,
                 host,
                 port,
                 ram_min_mb,
@@ -38,6 +39,7 @@ def get_servers():
                 "node_id": row["node_id"],
                 "status": row["status"],
                 "status_updated_at": row["status_updated_at"],
+                "close_time": row["close_time"],
                 "host": row["host"],
                 "port": row["port"],
                 "ram_min_mb": row["ram_min_mb"],
@@ -68,6 +70,7 @@ def get_server_config(name):
                 node_id,
                 status,
                 status_updated_at,
+                close_time,
                 host,
                 port,
                 ram_min_mb,
@@ -91,6 +94,7 @@ def get_server_config(name):
                 "node_id": row["node_id"],
                 "status": row["status"],
                 "status_updated_at": row["status_updated_at"],
+                "close_time": row["close_time"],
                 "host": row["host"],
                 "port": row["port"],
                 "ram_min_mb": row["ram_min_mb"],
@@ -122,6 +126,7 @@ def get_node_servers(node_id):
                 node_id,
                 status,
                 status_updated_at,
+                close_time,
                 host,
                 port,
                 ram_min_mb,
@@ -143,6 +148,7 @@ def get_node_servers(node_id):
                 "node_id": row["node_id"],
                 "status": row["status"],
                 "status_updated_at": row["status_updated_at"],
+                "close_time": row["close_time"],
                 "host": row["host"],
                 "port": row["port"],
                 "ram_min_mb": row["ram_min_mb"],
@@ -158,7 +164,7 @@ def get_node_servers(node_id):
 
 def add_server_config(
     name, display_name,
-    node_id,
+    node_id, close_time=30*60,
     host=None,
     port=None,
     ram_min_mb=2048,
@@ -169,6 +175,7 @@ def add_server_config(
 ):
     name, display_name = make_str(name), make_str(display_name)
     node_id = make_str(node_id)
+    close_time = make_int(close_time) or 30*60
     host = make_str(host)
     port = make_int(port)
     ram_min_mb = make_int(ram_min_mb) or 2048
@@ -199,6 +206,7 @@ def add_server_config(
                 name,
                 display_name,
                 node_id,
+                close_time,
                 status_updated_at,
                 host,
                 port,
@@ -208,12 +216,13 @@ def add_server_config(
                 stop_command,
                 working_directory
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 name,
                 display_name,
                 node_id,
+                close_time,
                 int(time.time()),
                 host,
                 port,
@@ -232,6 +241,36 @@ def add_server_config(
     finally:
         conn.close()
 
+
+
+def edit_server_close_time(name, close_time):
+    name = make_str(name)
+    close_time = make_int(close_time)
+    if not name or not close_time:
+        return DBReturn(Status.INVALID_INPUT)
+
+    conn = get_database()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE servers
+            SET close_time = ?
+            WHERE name = ?
+            """,
+            (close_time, name)
+        )
+
+        if cursor.rowcount == 0:
+            return DBReturn(Status.NOT_FOUND)
+        conn.commit()
+        return DBReturn(Status.OK)
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
 def edit_server_display_name(name, display_name):
