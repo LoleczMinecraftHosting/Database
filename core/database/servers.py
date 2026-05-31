@@ -257,7 +257,7 @@ def edit_server_close_time(name, close_time):
             """
             UPDATE servers
             SET close_time = ?
-            WHERE node_id = ?
+            WHERE name = ?
             """,
             (close_time, name)
         )
@@ -287,7 +287,7 @@ def edit_server_display_name(name, display_name):
             """
             UPDATE servers
             SET display_name = ?
-            WHERE node_id = ?
+            WHERE name = ?
             """,
             (display_name, name)
         )
@@ -320,7 +320,7 @@ def edit_server_node(name, node_id):
             """
             UPDATE servers
             SET node_id = ?
-            WHERE node_id = ?
+            WHERE name = ?
             """,
             (node_id, name)
         )
@@ -352,7 +352,7 @@ def edit_server_host(name, host, port):
             UPDATE servers
             SET host = ?,
                 port = ?
-            WHERE node_id = ?
+            WHERE name = ?
             """,
             (host, port, name)
         )
@@ -386,7 +386,7 @@ def edit_server_ram(name, ram_min_mb, ram_max_mb):
             UPDATE servers
             SET ram_min_mb = ?,
                 ram_max_mb = ?
-            WHERE node_id = ?
+            WHERE name = ?
             """,
             (ram_min_mb, ram_max_mb, name)
         )
@@ -416,7 +416,7 @@ def edit_server_start_command(name, start_command):
             """
             UPDATE servers
             SET start_command = ?
-            WHERE node_id = ?
+            WHERE name = ?
             """,
             (start_command, name)
         )
@@ -446,7 +446,7 @@ def edit_server_stop_command(name, stop_command):
             """
             UPDATE servers
             SET stop_command = ?
-            WHERE node_id = ?
+            WHERE name = ?
             """,
             (stop_command, name)
         )
@@ -476,7 +476,7 @@ def edit_server_working_directory(name, working_directory):
             """
             UPDATE servers
             SET working_directory = ?
-            WHERE node_id = ?
+            WHERE name = ?
             """,
             (working_directory, name)
         )
@@ -508,7 +508,7 @@ def update_server_status(name, status):
             SET
                 status = ?,
                 status_updated_at = ?
-            WHERE node_id = ?
+            WHERE name = ?
             """,
             (status, int(time.time()), name)
         )
