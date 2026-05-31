@@ -38,6 +38,6 @@ DROP TABLE permissions;
 ALTER TABLE permissions_new RENAME TO permissions;
 
 
-PRAGMA user_version = 4;
+PRAGMA user_version = 5;
 
 COMMIT;

@@ -58,6 +58,6 @@ ON servers (
 );
 
 
-PRAGMA user_version = 4;
+PRAGMA user_version = 5;
 
 COMMIT;
