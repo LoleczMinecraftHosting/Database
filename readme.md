@@ -6,6 +6,8 @@ Most of this database was copied from my [LoleczDustry Database](https://github.
 | ---- | ----- | ---- |
 | GET `/health`  | 200 | `{"status": "ok"}` |
 | GET `/get_perms` | 200 | `{"guilds":{"ID":{"server":PERMS}},`<br>`"users":{"ID":{"server":PERMS}},`<br>`"global":{"server":PERMS},`<br>`"roles":{"ID":{"server":PERMS}}}` |
+| POST `/set_perm` | 200 / 400 / 404 | Include `subject_type, subject_id, server_name, perms` |
+| DELETE `/remove_perm` | 200 / 400 / 404 | Include `subject_type, subject_id, server_name` |
 | GET `/servers` | 200 | All server configs |
 | GET `/server/{server_name}` | 200 / 404 | One server config |
 | GET `/nodes` | 200 | All nodes |

@@ -1,7 +1,7 @@
 from .shema_manager import create_database, migrate_database
 from .utils import get_database_version, DBReturn
 from .utils import Status as DBStatus
-from .permissions import get_perms
+from .permissions import get_perms, set_perm, remove_perm
 from .nodes import (
     get_node, get_nodes,
     add_node
