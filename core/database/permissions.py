@@ -45,7 +45,7 @@ def get_perms():
         for row in cursor.fetchall():
             subject_type = make_str(row["subject_type"])
             subject_id = make_str(row["subject_id"])
-            server_name = make_str(row["server_name"])
+            server_name = make_str(row["server_name"] or "*")
             perms = make_int(row["perms"])
             if not subject_type or not server_name or perms is None:
                 continue
@@ -80,7 +80,9 @@ def set_perm(subject_type, subject_id, server_name, perms):
     conn = get_database()
     cursor = conn.cursor()
     try:
-        if not server_exists(server_name, cursor):
+        if server_name == "*":
+            server_name = None
+        elif not server_exists(server_name, cursor):
             return DBReturn(Status.NOT_FOUND)
 
         cursor.execute(
@@ -131,19 +133,33 @@ def remove_perm(subject_type, subject_id, server_name):
     conn = get_database()
     cursor = conn.cursor()
     try:
-        cursor.execute(
-            """
-            DELETE FROM permissions
-            WHERE subject_type = ?
-              AND subject_id = ?
-              AND server_name = ?
-            """,
-            (
-                subject_type,
-                subject_id,
-                server_name,
-            ),
-        )
+        if server_name == "*":
+            cursor.execute(
+                """
+                DELETE FROM permissions
+                WHERE subject_type = ?
+                AND subject_id = ?
+                AND server_name IS NULL
+                """,
+                (
+                    subject_type,
+                    subject_id,
+                ),
+            )
+        else:
+            cursor.execute(
+                """
+                DELETE FROM permissions
+                WHERE subject_type = ?
+                AND subject_id = ?
+                AND server_name = ?
+                """,
+                (
+                    subject_type,
+                    subject_id,
+                    server_name,
+                ),
+            )
 
         if cursor.rowcount == 0:
             return DBReturn(Status.NOT_FOUND)
