@@ -4,18 +4,18 @@ from config import HONEYPOTS_DIR
 
 # regex, filename, content_type
 HONEYPOTS = [
-    (
-        re.compile(r"/\.env(?:\.[a-zA-Z0-9_-]+)?"),
-        "env.txt",
+        (
+        re.compile(r"(?:^|/)\.env(?:\.[a-z0-9_-]+)*(?=/|$)", re.I),
+        ".env",
         "text/plain"
     ),
     (
-        re.compile(r"/auth\.json"),
+        re.compile(r"(?:^|/)auth\.json(?:\.[a-z0-9_-]+)*(?=/|$)", re.I),
         "auth.json",
         "application/json"
     ),
     (
-        re.compile(r"/schema\.rb"),
+        re.compile(r"(?:^|/)schema\.rb(?:\.[a-z0-9_-]+)*(?=/|$)", re.I),
         "schema.rb",
         "text/plain"
     ),
