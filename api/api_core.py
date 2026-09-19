@@ -7,6 +7,7 @@ import re
 from core.logs import log, INFO, WARNING, ERROR
 from core.verify import verify_signature, make_response_signature_headers
 from .utils import APIReturn, APIFunc, cleanup_seen_nonces
+from .honeypot import get_honeypot
 
 
 def _compile_template(template: str) -> Pattern[str]:
@@ -32,6 +33,8 @@ class APIHandler(BaseHTTPRequestHandler):
 
         handler, params = self._match(table, path)
         if handler is None:
+            if self.command == "GET" and self._reply_honeypot(path, client_ip):
+                return
             log(WARNING,
                 f"API {self.command} 404 <{client_ip}> {self.path}")
             self.send_error(404)
@@ -53,11 +56,12 @@ class APIHandler(BaseHTTPRequestHandler):
                 self.reply(APIReturn({"error": "unauthorized"}, 401))
                 return
 
+        res: APIReturn
         try:
             if read_body:
-                res: APIReturn = handler.func(self.headers, query, body, **params)
+                res = handler.func(self.headers, query, body, **params)
             else:
-                res: APIReturn = handler.func(self.headers, query, **params)
+                res = handler.func(self.headers, query, **params)
         except Exception as e:
             log(ERROR, f"API ERROR {self.command} 500 <{client_ip}> {self.path}\n E; {e}")
             self.reply(APIReturn({"error": "Internal server error"}, 500))
@@ -160,3 +164,17 @@ class APIHandler(BaseHTTPRequestHandler):
             return xrip.strip()
 
         return self.client_address[0]
+
+    def _reply_honeypot(self, path, client_ip):
+        response = get_honeypot(path)
+        if response is None:
+            return False
+        content_type, body = response
+        log(WARNING, f"API HONEYPOT {self.command} 200 <{client_ip}> {self.path}")
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
+        return True

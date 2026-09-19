@@ -9,6 +9,8 @@ DATABASE_SUPPORTED_VERSION = 6
 DATABASE_DEFINITIONS_DIR = DIR / "database_schemas"
 DATABASE_SCHEMA_MIGRATIONS_DIR = DATABASE_DEFINITIONS_DIR / "migrations"
 DATABASE_SCHEMA_FULL_DIR = DATABASE_DEFINITIONS_DIR / "full"
+HONEYPOTS_DIR = DIR / "api" / "honeypots"
+
 AUTH_MAP_LINK = "https://minecraft.loleczkowo.com/auth_map.json"
 PRIV_KEY = DIR / "priv_key.pem"
 

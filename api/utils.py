@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Callable, Dict, Literal
 import json
 import time
+from http.client import HTTPMessage
 
 
 @dataclass
@@ -12,7 +13,7 @@ class APIReturn:
 
 @dataclass
 class APIFunc:
-    func: Callable[[object], APIReturn]
+    func: Callable[[HTTPMessage, dict[str, list[str]], ...], APIReturn]
     autoauth: bool | set
 
 
