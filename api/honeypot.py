@@ -1,6 +1,7 @@
 import re
 
 from config import HONEYPOTS_DIR
+from urllib.parse import unquote
 
 # regex, filename, content_type
 HONEYPOTS = [
@@ -23,8 +24,14 @@ HONEYPOTS = [
 
 
 def get_honeypot(path):
+    for _ in range(3):
+        decoded = unquote(path)
+        if decoded == path:
+            break
+        path = decoded
+    path = path.replace("\\", "/")
     for regex, filename, content_type in HONEYPOTS:
-        if regex.fullmatch(path):
+        if regex.search(path):
             file = HONEYPOTS_DIR / filename
             return content_type, file.read_bytes()
     return None
