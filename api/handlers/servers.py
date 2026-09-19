@@ -6,7 +6,7 @@ from core.database import (
     edit_server_display_name, edit_server_host,
     edit_server_node, edit_server_ram, edit_server_start_command, edit_server_stop_command,
     edit_server_working_directory,
-    update_server_status,
+    update_server_status, update_server_players, update_server_usage,
 )
 from api.api_core import APIHandler
 from api.utils import APIReturn, read_dict, api_get_json
@@ -28,7 +28,9 @@ def get_server(headers, query, server_name):
 
 @APIHandler.post("/server/{server_name}", autoauth={"admin"})
 def post_add_server(headers, query, data, server_name):
-    success, display_name, node_id, close_time, host, port, min_ram_mb, max_ram_mb, start_command, stop_command, directory = read_dict(api_get_json(headers, data), ["display_name", "node_id", "close_time", "host", "port", "min_ram_mb", "max_ram_mb", "start_command", "stop_command", "directory"])
+    success, display_name, node_id, close_time, host, port, min_ram_mb, max_ram_mb, start_command, stop_command, directory = read_dict(
+        api_get_json(headers, data), ["display_name", "node_id", "close_time", "host", "port", "min_ram_mb", "max_ram_mb", "start_command", "stop_command", "directory"]
+    )
     if success is not True:
         return success
     result = add_server_config(
@@ -136,6 +138,41 @@ def post_edit_server_ram(headers, query, data, server_name):
 def post_update_server_status(headers, query, data, server_name):
     new_value = api_get_json(headers, data)
     result = update_server_status(name=server_name, status=new_value)
+    if result.status == DBStatus.INVALID_INPUT:
+        return APIReturn({"error": "invalid input"}, code=400)
+    if result.status == DBStatus.NOT_FOUND:
+        return APIReturn({"error": "server does not exist"}, code=404)
+    return APIReturn({"status": "ok"})
+
+
+@APIHandler.post("/server/{server_name}/players")
+def post_update_server_players(headers, query, data, server_name):
+    success, player_count, max_player_count, player_nicknames = read_dict(api_get_json(headers, data), ["player_count", "max_player_count", "player_nicknames"])
+    if success is not True:
+        return success
+    result = update_server_players(
+        name=server_name,
+        player_count=player_count,
+        max_player_count=max_player_count,
+        player_nicknames=player_nicknames
+    )
+    if result.status == DBStatus.INVALID_INPUT:
+        return APIReturn({"error": "invalid input"}, code=400)
+    if result.status == DBStatus.NOT_FOUND:
+        return APIReturn({"error": "server does not exist"}, code=404)
+    return APIReturn({"status": "ok"})
+
+
+@APIHandler.post("/server/{server_name}/usage")
+def post_update_server_usage(headers, query, data, server_name):
+    success, ram_usage_mb, cpu_usage_percent = read_dict(api_get_json(headers, data), ["ram_usage_mb", "cpu_usage_percent"])
+    if success is not True:
+        return success
+    result = update_server_usage(
+        name=server_name,
+        ram_usage_mb=ram_usage_mb,
+        cpu_usage_percent=cpu_usage_percent
+    )
     if result.status == DBStatus.INVALID_INPUT:
         return APIReturn({"error": "invalid input"}, code=400)
     if result.status == DBStatus.NOT_FOUND:

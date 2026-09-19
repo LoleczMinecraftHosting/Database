@@ -14,7 +14,7 @@ from .servers import (
     edit_server_node, edit_server_ram,
     edit_server_start_command, edit_server_stop_command,
     edit_server_working_directory,
-    update_server_status,
+    update_server_status, update_server_players, update_server_usage
 )
 
 
@@ -23,9 +23,12 @@ __all__ = [
     "create_database", "migrate_database",
     "get_database_version",
 
-    "get_perms",
+
+    "get_perms", "set_perm", "remove_perm",
+
     "get_node", "get_nodes",
     "add_node",
+
     "get_servers", "get_server_config", "get_node_servers",
     "add_server_config",
     "edit_server_close_time",
@@ -33,5 +36,5 @@ __all__ = [
     "edit_server_node", "edit_server_ram",
     "edit_server_start_command", "edit_server_stop_command",
     "edit_server_working_directory",
-    "update_server_status",
+    "update_server_status", "update_server_players", "update_server_usage"
 ]

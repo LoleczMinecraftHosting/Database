@@ -1,4 +1,6 @@
 import time
+import json
+import math
 
 from core.utils import make_int, make_str
 from .utils import DBReturn, Status, get_database
@@ -18,6 +20,11 @@ def get_servers():
                 node_id,
                 status,
                 status_updated_at,
+                player_count,
+                max_player_count,
+                player_nicknames,
+                ram_usage_mb,
+                cpu_usage_percent,
                 close_time,
                 host,
                 port,
@@ -39,6 +46,11 @@ def get_servers():
                 "node_id": row["node_id"],
                 "status": row["status"],
                 "status_updated_at": row["status_updated_at"],
+                "player_count": row["player_count"],
+                "max_player_count": row["max_player_count"],
+                "player_nicknames": json.loads(row["player_nicknames"]) if row["player_nicknames"] is not None else None,
+                "ram_usage_mb": row["ram_usage_mb"],
+                "cpu_usage_percent": row["cpu_usage_percent"],
                 "close_time": row["close_time"],
                 "host": row["host"],
                 "port": row["port"],
@@ -511,6 +523,94 @@ def update_server_status(name, status):
             WHERE name = ?
             """,
             (status, int(time.time()), name)
+        )
+
+        if cursor.rowcount == 0:
+            return DBReturn(Status.NOT_FOUND)
+        conn.commit()
+        return DBReturn(Status.OK)
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def update_server_players(name, player_count, max_player_count, player_nicknames):
+    name = make_str(name)
+    player_count = make_int(player_count)
+    max_player_count = make_int(max_player_count)
+
+    if not name:
+        return DBReturn(Status.INVALID_INPUT)
+    if player_count is not None and player_count < 0:
+        return DBReturn(Status.INVALID_INPUT)
+    if max_player_count is not None and max_player_count < 0:
+        return DBReturn(Status.INVALID_INPUT)
+    if player_nicknames is not None:
+        if not isinstance(player_nicknames, list):
+            return DBReturn(Status.INVALID_INPUT)
+        if not all(isinstance(nick, str) for nick in player_nicknames):
+            return DBReturn(Status.INVALID_INPUT)
+
+        player_nicknames = json.dumps(player_nicknames)
+
+    conn = get_database()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE servers
+            SET
+                player_count = ?,
+                max_player_count = ?,
+                player_nicknames = ?
+            WHERE name = ?
+            """,
+            (player_count, max_player_count, player_nicknames, name)
+        )
+
+        if cursor.rowcount == 0:
+            return DBReturn(Status.NOT_FOUND)
+        conn.commit()
+        return DBReturn(Status.OK)
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+def update_server_usage(name, ram_usage_mb, cpu_usage_percent):
+    name = make_str(name)
+    ram_usage_mb = make_int(ram_usage_mb)
+
+    if not name:
+        return DBReturn(Status.INVALID_INPUT)
+    if ram_usage_mb is not None and ram_usage_mb < 0:
+        return DBReturn(Status.INVALID_INPUT)
+
+    if cpu_usage_percent is not None:
+        try:
+            cpu_usage_percent = float(cpu_usage_percent)
+        except (TypeError, ValueError, OverflowError):
+            return DBReturn(Status.INVALID_INPUT)
+
+        if not math.isfinite(cpu_usage_percent) or cpu_usage_percent < 0:
+            return DBReturn(Status.INVALID_INPUT)
+
+    conn = get_database()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE servers
+            SET
+                ram_usage_mb = ?,
+                cpu_usage_percent = ?
+            WHERE name = ?
+            """,
+            (ram_usage_mb, cpu_usage_percent, name)
         )
 
         if cursor.rowcount == 0:

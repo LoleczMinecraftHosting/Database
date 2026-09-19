@@ -1,0 +1,78 @@
+BEGIN;
+
+PRAGMA foreign_keys = ON;
+
+
+CREATE TABLE permissions (
+    subject_type TEXT NOT NULL,
+    subject_id TEXT NOT NULL,
+    server_name TEXT,
+    perms INTEGER NOT NULL,
+
+    CHECK (subject_type IN ('default', 'user', 'guild', 'role')),
+
+    UNIQUE (
+        subject_type,
+        subject_id,
+        server_name
+    ),
+
+    FOREIGN KEY(server_name) REFERENCES servers(name)
+);
+
+
+CREATE TABLE nodes (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    address TEXT NOT NULL
+);
+
+
+CREATE TABLE servers (
+    name TEXT PRIMARY KEY,
+
+    display_name TEXT NOT NULL,
+    node_id TEXT,
+
+    status TEXT NOT NULL DEFAULT 'unknown',
+    status_updated_at INTEGER,
+
+    player_count INTEGER,
+    max_player_count INTEGER,
+    player_nicknames TEXT DEFAULT "[]"
+        CHECK (
+            CASE
+                WHEN player_nicknames IS NULL THEN 1
+                WHEN json_valid(player_nicknames)
+                    THEN json_type(player_nicknames) = 'array'
+                ELSE 0
+            END
+        ),
+
+    ram_usage_mb INTEGER,
+    cpu_usage_percent REAL,
+
+    close_time INTEGER NOT NULL DEFAULT 1800,
+
+    host TEXT,
+    port INTEGER,
+
+    ram_min_mb INTEGER NOT NULL DEFAULT 2048,
+    ram_max_mb INTEGER NOT NULL DEFAULT 4096,
+
+    start_command TEXT,
+    stop_command TEXT,
+    working_directory TEXT,
+
+    FOREIGN KEY(node_id) REFERENCES nodes(id)
+);
+
+CREATE INDEX idx_servers_node
+ON servers (
+    node_id
+);
+
+
+PRAGMA user_version = 6;
+
+COMMIT;
