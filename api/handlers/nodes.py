@@ -1,7 +1,7 @@
 from core.database import (
     DBStatus,
     get_node_servers, get_nodes, get_node,
-    add_node,
+    add_node, edit_node
 )
 from api.api_core import APIHandler
 from api.utils import APIReturn, read_dict, api_get_json
@@ -40,4 +40,16 @@ def api_add_node(headers, query, data):
         return APIReturn({"error": "invalid input"}, code=400)
     if result.status == DBStatus.CONFLICT:
         return APIReturn({"error": "already exists"}, code=409)
+    return APIReturn({"status": "ok"})
+
+@APIHandler.post("/node/{node_id}", autoauth={"admin"})
+def api_edit_node(headers, query, data, node_id):
+    success, name, address = read_dict(api_get_json(headers, data), ["name", "address"])
+    if success is not True:
+        return success
+    result = edit_node(node_id, name, address)
+    if result.status == DBStatus.INVALID_INPUT:
+        return APIReturn({"error": "invalid input"}, code=400)
+    if result.status == DBStatus.NOT_FOUND:
+        return APIReturn({"error": "node does not exist"}, code=404)
     return APIReturn({"status": "ok"})

@@ -4,7 +4,7 @@ from .utils import Status as DBStatus
 from .permissions import get_perms, set_perm, remove_perm
 from .nodes import (
     get_node, get_nodes,
-    add_node
+    add_node, edit_node
 )
 from .servers import (
     get_servers, get_server_config, get_node_servers,
@@ -27,7 +27,7 @@ __all__ = [
     "get_perms", "set_perm", "remove_perm",
 
     "get_node", "get_nodes",
-    "add_node",
+    "add_node", "edit_node",
 
     "get_servers", "get_server_config", "get_node_servers",
     "add_server_config",

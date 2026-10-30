@@ -26,3 +26,4 @@ Most of this database was copied from my [LoleczDustry Database](https://github.
 | POST `/server/{server_name}/players` | 200 / 400 / 404 | Include `player_count, max_player_count, player_nicknames` |
 | POST `/server/{server_name}/usage` | 200 / 400 / 404 | Include `ram_usage_mb, cpu_usage_percent` |
 | POST `/add_node` | toolazy | Include `node_id, name, address` |
+| POST `/node/{node_id}` | 200 / 400 / 404 | include `name, address` |

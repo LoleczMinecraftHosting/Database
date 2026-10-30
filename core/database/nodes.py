@@ -100,3 +100,33 @@ def add_node(node_id, name, address) -> DBReturn:
         raise
     finally:
         conn.close()
+
+
+def edit_node(node_id, name, address) -> DBReturn:
+    node_id = make_str(node_id)
+    name = make_str(name)
+    address = make_str(address)
+    if not node_id or not name or not address:
+        return DBReturn(Status.INVALID_INPUT)
+
+    conn = get_database()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            UPDATE nodes
+            SET name = ?,
+                address = ?
+            WHERE id = ?
+            """,
+            (name, address, node_id)
+        )
+        if cursor.rowcount == 0:
+            return DBReturn(Status.NOT_FOUND)
+        conn.commit()
+        return DBReturn()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
